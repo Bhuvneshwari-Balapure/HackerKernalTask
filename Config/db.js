@@ -1,15 +1,16 @@
-const mysql = require("mysql2/promise");
+const { Model } = require("objection");
+const Knex = require("knex");
+require("dotenv").config();
+const knex = Knex({
+  client: "mysql2",
+  connection: {
+    host: process.env.DB_HOST || "localhost",
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASS || "",
+    database: process.env.DB_NAME || "taskmanager",
+  },
+});
 
-async function myDbConnection() {
-  const conn = await mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-  });
+Model.knex(knex);
 
-  console.log("Database connected successfully!");
-  return conn;
-}
-
-module.exports = myDbConnection;
+module.exports = knex;

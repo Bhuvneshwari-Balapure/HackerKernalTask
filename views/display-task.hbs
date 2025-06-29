@@ -7,6 +7,7 @@
       <th>Task Name</th>
       <th>Status</th>
       <th>Assigned To</th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -15,7 +16,12 @@
         <td>{{this.id}}</td>
         <td>{{this.task_name}}</td>
         <td>{{this.status}}</td>
-        <td>{{this.name}}</td>
+        <td>{{this.user_name}}</td>
+        <td>
+          <form action="/export" method="GET">
+            <button type="submit">Export to Excel</button>
+          </form>
+        </td>
       </tr>
     {{/each}}
   </tbody>

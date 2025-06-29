@@ -1,7 +1,11 @@
+const ExcelJS = require("exceljs");
+const User = require("../modal/userModal");
+const Task = require("../modal/taskModal");
+
+//  All Users
 const showTaskForm = async (req, res) => {
-  const db = req.app.locals.db;
   try {
-    const [users] = await db.query("SELECT * FROM users");
+    const users = await User.query();
     res.render("add-task", { users });
   } catch (err) {
     console.log("Error:", err);
@@ -9,8 +13,8 @@ const showTaskForm = async (req, res) => {
   }
 };
 
+// ✅ Save New Task to DB
 const saveTask = async (req, res) => {
-  const db = req.app.locals.db;
   const { user_id, task_name, status } = req.body;
 
   if (!user_id || !task_name || !status) {
@@ -18,26 +22,91 @@ const saveTask = async (req, res) => {
   }
 
   try {
-    await db.query(
-      "INSERT INTO tasks (user_id, task_name, status) VALUES (?, ?, ?)",
-      [user_id, task_name, status]
-    );
-    const [users] = await db.query("SELECT * FROM users");
+    await Task.query().insert({
+      user_id,
+      task_name,
+      status,
+    });
+
+    const users = await User.query();
     res.render("add-task", { users, alert: "Task added!" });
   } catch (err) {
     console.log("Error:", err);
     res.status(500).send("Error saving task");
   }
 };
-const displayTasks = async (req, res) => {
-  const db = req.app.locals.db;
-  const [tasks] = await db.query(`
-    SELECT tasks.id, tasks.task_name, tasks.status, users.name
-    FROM tasks
-    JOIN users ON tasks.user_id = users.id
-  `);
 
-  res.render("display-task", { tasks });
+// ✅ Display All Tasks with User Names (JOIN)
+const displayTasks = async (req, res) => {
+  try {
+    const tasks = await Task.query().withGraphFetched("user");
+    const taskData = tasks.map((task) => ({
+      id: task.id,
+      task_name: task.task_name,
+      status: task.status,
+      user_name: task.user?.name || "N/A",
+    }));
+
+    res.render("display-task", { tasks: taskData });
+  } catch (err) {
+    console.log("Error:", err);
+    res.status(500).send("Error fetching tasks");
+  }
 };
 
-module.exports = { showTaskForm, saveTask, displayTasks };
+// Data to Excel
+const exportExcel = async (req, res) => {
+  try {
+    const users = await User.query();
+    const tasks = await Task.query().withGraphFetched("user");
+
+    const workbook = new ExcelJS.Workbook();
+
+    const userSheet = workbook.addWorksheet("User");
+    userSheet.columns = [
+      { header: "ID", key: "id" },
+      { header: "Name", key: "name" },
+      { header: "Email", key: "email" },
+      { header: "Mobile", key: "mobile" },
+    ];
+    users.forEach((user) => userSheet.addRow(user));
+
+    const taskSheet = workbook.addWorksheet("Task");
+    taskSheet.columns = [
+      { header: "ID", key: "id" },
+      { header: "Task Name", key: "task_name" },
+      { header: "Status", key: "status" },
+      { header: "Assigned To", key: "assigned_to" },
+    ];
+    tasks.forEach((task) => {
+      taskSheet.addRow({
+        id: task.id,
+        task_name: task.task_name,
+        status: task.status,
+        assigned_to: task.user ? task.user.name : "N/A",
+      });
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=users_tasks.xlsx"
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.log("Excel Export Error:", err);
+    res.status(500).send("Could not generate Excel file");
+  }
+};
+
+module.exports = {
+  showTaskForm,
+  saveTask,
+  displayTasks,
+  exportExcel,
+};
