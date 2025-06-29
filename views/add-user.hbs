@@ -1,0 +1,93 @@
+
+
+<head>
+  <style>
+
+    form {
+      max-width: 500px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    h4 {
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button, input[type="submit"] {
+      background-color: #007bff;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover, input[type="submit"]:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li><a href="/">Home</a></li>
+      <li>New User</li>
+    </ol>
+  </nav>
+
+   {{#if alert}}
+  <div class="alert-success">
+    <button class="btn-close" onclick="this.parentElement.style.display='none';">x</button>
+    {{alert}}
+  </div>
+  {{/if}}
+
+  <form method="POST" action="/create" onsubmit="return validateUserForm()">
+    <h4 class="text-center mb-4">Add New User</h4>
+    {{> user-form}}
+  </form>
+
+<script>
+  function validateUserForm() {
+ 
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const mobile = document.getElementById('mobile').value.trim();
+
+ 
+    if (name === "") {
+      alert("Please enter your name");
+      return false;
+    }
+
+    if (email === "" || !email.includes("@") || !email.includes(".")) {
+      alert("Please enter a valid email");
+      return false;
+    }
+
+    if (mobile === "" || mobile.length !== 10 || isNaN(mobile) || !mobile.startsWith("6") && !mobile.startsWith("7") && !mobile.startsWith("8") && !mobile.startsWith("9")) {
+      alert("Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9");
+      return false;
+    }
+
+    
+    return true;
+  }
+</script>
+
+</body>

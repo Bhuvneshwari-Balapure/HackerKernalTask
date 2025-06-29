@@ -1,0 +1,47 @@
+<body>
+  <form
+    class="form-container"
+    method="POST"
+    action="/create"
+    onsubmit="return validateUserForm()"
+  >
+    <div class="form-row">
+      <div class="form-group half-width">
+        <label for="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          placeholder="Full Name"
+          value="{{this.name}}"
+        />
+      </div>
+
+      <div class="form-group half-width">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="email@email.com"
+          value="{{this.email}}"
+        />
+      </div>
+
+      <div class="form-group half-width">
+        <label for="mobile">Mobile Number</label>
+        <input
+          type="number"
+          id="mobile"
+          name="mobile"
+          placeholder="1234567890"
+          value="{{this.mobile}}"
+        />
+      </div>
+
+      <div class="form-group full-width">
+        <button type="submit">Submit</button>
+      </div>
+    </div>
+  </form>
+</body>

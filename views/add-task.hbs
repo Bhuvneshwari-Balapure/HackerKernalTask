@@ -1,0 +1,31 @@
+
+
+{{#if alert}}
+<div style="background-color: #d4edda; color: #155724; padding: 10px; margin: 10px 0; border: 1px solid #c3e6cb;">
+  {{alert}}
+</div>
+{{/if}}
+
+<form method="POST" action="/task" onsubmit="return validateTaskForm()">
+  <h4 class="text-center mb-4">Assign New Task</h4>
+  {{> task-form}}
+</form>
+
+<script>
+  function validateTaskForm() {
+    const user = document.getElementById("user").value;
+    const task = document.getElementById("task_name").value.trim();
+
+    if (user === "" || user === "Select User") {
+      alert("Please select a user.");
+      return false;
+    }
+
+    if (task === "") {
+      alert("Task name is required.");
+      return false;
+    }
+
+    return true;
+  }
+</script>
