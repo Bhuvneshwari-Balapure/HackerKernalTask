@@ -80,8 +80,8 @@
       return false;
     }
 
-    if (mobile === "" || mobile.length !== 10 || isNaN(mobile) || !mobile.startsWith("6") && !mobile.startsWith("7") && !mobile.startsWith("8") && !mobile.startsWith("9")) {
-      alert("Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9");
+    if (mobile === "" ) {
+      alert("Please enter your mobile number");
       return false;
     }
 
